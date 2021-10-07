@@ -21,7 +21,6 @@ def extract_speech_utterances(dir_path, slice_path):
 		nonzero = fq.nonzero()[0]
 		diff = np.diff(nonzero)
 		skip_inds = np.where(diff>1)[0]
-		print(skip_inds)
 		i =0
 		newInd = nonzero[0]
 		filename = files[k].replace('.wav', '')
@@ -29,30 +28,21 @@ def extract_speech_utterances(dir_path, slice_path):
 			try:
 				dist  = pitches[k].get_time_from_frame_number(nonzero[s+1])- pitches[k].get_time_from_frame_number(nonzero[s])
 				if dist >= 0.25:
-					print(dist)
-					print(newInd)
-					print(nonzero[s+1])
-					print(nonzero[s])
 					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
 					newInd = nonzero[s+1]
 			except:
 				pass
 		dist = pitches[k].get_time_from_frame_number(len(pitches[k])) - pitches[k].get_time_from_frame_number(nonzero[-1])
 		if dist >= 0.25:
-			print(dist)
 			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(pitches[newInd]), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
 		k+1
 	print("segmentation completed")
 
 
 def slice_audio(slice_from, slice_to, path, name, audio_file):
-	print(audio_file)
-	print(name)
-	print(path)
 	audio = AudioSegment.from_wav(audio_file)
 	try:
 		seg = audio[slice_from * 1000:slice_to * 1000]
-		print(seg)
 		seg.set_channels(2)
 		seg.export(path+name, format="wav", bitrate="192k")
 	except:
