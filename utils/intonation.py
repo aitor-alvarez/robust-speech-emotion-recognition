@@ -11,7 +11,6 @@ from sklearn.preprocessing import MinMaxScaler
 #Functions to extract speech utterances and intonation contours and to plot them with their acoustic features
 
 
-
 def extract_speech_utterances(dir_path, slice_path):
 	files = [f for f in os.listdir(dir_path) if f.endswith('.wav')]
 	pitches = [parselmouth.Sound(dir_path+f).to_pitch() for f in files ]
@@ -21,7 +20,6 @@ def extract_speech_utterances(dir_path, slice_path):
 		nonzero = fq.nonzero()[0]
 		diff = np.diff(nonzero)
 		skip_inds = np.where(diff>1)[0]
-		i =0
 		newInd = nonzero[0]
 		filename = files[k].replace('.wav', '')
 		for s in skip_inds:
@@ -34,7 +32,7 @@ def extract_speech_utterances(dir_path, slice_path):
 				pass
 		dist = pitches[k].get_time_from_frame_number(len(pitches[k])) - pitches[k].get_time_from_frame_number(nonzero[-1])
 		if dist >= 0.25:
-			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(pitches[newInd]), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
+			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
 		k+1
 	print("segmentation completed")
 
