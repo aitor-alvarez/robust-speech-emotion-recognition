@@ -15,8 +15,9 @@ def extract_speech_utterances(dir_path, slice_path):
 	files = [f for f in os.listdir(dir_path) if f.endswith('.wav')]
 	pitches = [parselmouth.Sound(dir_path+f).to_pitch() for f in files ]
 	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
-	k=0
+	k = 0
 	for fq in fqs:
+		print(k)
 		nonzero = fq.nonzero()[0]
 		diff = np.diff(nonzero)
 		skip_inds = np.where(diff>1)[0]
@@ -29,18 +30,18 @@ def extract_speech_utterances(dir_path, slice_path):
 					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
 					newInd = nonzero[s+1]
 			except:
-				pass
+				print("error")
 		dist = pitches[k].get_time_from_frame_number(len(pitches[k])) - pitches[k].get_time_from_frame_number(nonzero[-1])
-		if dist >= 0.25:
+		if dist >= 0.25 and dist<0.5:
 			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
-		k+1
+		k +=1
 	print("segmentation completed")
 
 
 def slice_audio(slice_from, slice_to, path, name, audio_file):
 	audio = AudioSegment.from_wav(audio_file)
 	try:
-		seg = audio[slice_from * 1000:slice_to * 1000]
+		seg = audio[slice_from * 1000:slice_to * 1100]
 		seg.set_channels(2)
 		seg.export(path+name, format="wav", bitrate="192k")
 	except:
