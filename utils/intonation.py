@@ -5,12 +5,13 @@ import numpy as np
 import os
 import parselmouth
 from pydub import  AudioSegment
-import uuid
+from torchaudio import functional as F
+import torchaudio
 from sklearn.preprocessing import MinMaxScaler
 
 #Functions to extract speech utterances and intonation contours and to plot them with their acoustic features
 
-
+#Segment speech utterances based on
 def extract_speech_utterances(dir_path, slice_path):
 	files = [f for f in os.listdir(dir_path) if f.endswith('.wav')]
 	pitches = [parselmouth.Sound(dir_path+f).to_pitch() for f in files ]
@@ -27,13 +28,13 @@ def extract_speech_utterances(dir_path, slice_path):
 			try:
 				dist  = pitches[k].get_time_from_frame_number(nonzero[s+1])- pitches[k].get_time_from_frame_number(nonzero[s])
 				if dist >= 0.25:
-					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
+					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(s)+'.wav', dir_path+filename+'.wav')
 					newInd = nonzero[s+1]
 			except:
 				print("error")
 		dist = pitches[k].get_time_from_frame_number(len(pitches[k])) - pitches[k].get_time_from_frame_number(nonzero[-1])
 		if dist >= 0.25 and dist<0.5:
-			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(uuid.uuid4())+'.wav', dir_path+filename+'.wav')
+			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(s+1)+'.wav', dir_path+filename+'.wav')
 		k +=1
 	print("segmentation completed")
 
@@ -48,6 +49,27 @@ def slice_audio(slice_from, slice_to, path, name, audio_file):
 		print("NO")
 
 
+#extract f0 from Kaldi pitch function
+def get_f0_kaldi(audio_dir):
+	files = [torchaudio.load(audio_dir+f) for f in os.listdir(audio_dir) if f.endswith('.wav')]
+	pitch_feat = [ F.compute_kaldi_pitch(t[0], t[1], min_f0=50, max_f0=500)[0].tolist() for t in files]
+	fqs = []
+	for p in pitch_feat:
+		fq = []
+		for freq in p:
+			fq.append(freq[1])
+		fqs.append(fq)
+	return fqs
+
+
+#extract f0 from Parselmouth Praat function
+def get_f0_praat(audio_dir):
+	files = [f for f in os.listdir(audio_dir) if f.endswith('.wav')]
+	pitches = [parselmouth.Sound(audio_dir + f).to_pitch() for f in files]
+	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
+	return fqs
+
+
 def get_contour(fq):
 	fq = fq.reshape(-1, 1)
 	scaler = MinMaxScaler((0, 5))
@@ -56,7 +78,7 @@ def get_contour(fq):
 	return contour
 
 
-def get_contour2(f0, n_clusters):
+def get_contour_kmeans(f0, n_clusters):
 	f0 = f0.reshape(-1, 1)
 	scores=[]
 	c =[]
