@@ -78,7 +78,7 @@ def get_interval_contour(fqs):
 			if f[i] == 0 or f[i+1] == 0:
 				pass
 			else:
-				dist = f[i]-f[i+1]
+				dist = 1200 * np.log2(f[i+1]/f[i])
 				contour.append(dist)
 				inds.append((i, i+1))
 	return contour, inds
