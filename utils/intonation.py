@@ -71,17 +71,21 @@ def get_f0_praat(audio_dir):
 
 
 def get_interval_contour(fqs):
-	contour = []
+	contours = []
 	inds=[]
 	for f in fqs:
+		contour = []
+		ind = []
 		for i in range(len(f)):
 			if f[i] == 0 or f[i+1] == 0:
 				pass
 			else:
 				dist = 1200 * np.log2(f[i+1]/f[i])
 				contour.append(dist)
-				inds.append((i, i+1))
-	return contour, inds
+				ind.append((i, i+1))
+		contours.append(contour)
+		inds.append(ind)
+	return contours, inds
 
 
 def get_contour_scale(fq):
