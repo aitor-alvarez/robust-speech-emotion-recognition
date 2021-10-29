@@ -18,7 +18,6 @@ def extract_speech_utterances(dir_path, slice_path):
 	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
 	k = 0
 	for fq in fqs:
-		print(k)
 		nonzero = fq.nonzero()[0]
 		diff = np.diff(nonzero)
 		skip_inds = np.where(diff>1)[0]
@@ -59,7 +58,7 @@ def get_f0_kaldi(audio_dir):
 		for freq in p:
 			fq.append(freq[1])
 		fqs.append(fq)
-	return fqs
+	return fqs, files
 
 
 #extract f0 from Parselmouth Praat function
@@ -67,25 +66,105 @@ def get_f0_praat(audio_dir):
 	files = [f for f in os.listdir(audio_dir) if f.endswith('.wav')]
 	pitches = [parselmouth.Sound(audio_dir + f).to_pitch() for f in files]
 	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
-	return fqs
+	return fqs, files
 
 
+#return a list of intervallic distances between F0 points expressed in cents
 def get_interval_contour(fqs):
 	contours = []
 	inds=[]
 	for f in fqs:
 		contour = []
 		ind = []
-		for i in range(len(f)):
-			if f[i] == 0 or f[i+1] == 0:
-				pass
-			else:
-				dist = 1200 * np.log2(f[i+1]/f[i])
-				contour.append(dist)
-				ind.append((i, i+1))
+		for i in range(len(f)-1):
+			if i < len(f):
+				if f[i] == 0 or f[i+1] == 0:
+					pass
+				else:
+					dist = 1200 * np.log2(f[i+1]/f[i])
+					contour.append(dist)
+					ind.append((i, i+1))
 		contours.append(contour)
 		inds.append(ind)
 	return contours, inds
+
+
+#Get contour approximation by intervals in cents
+def create_contour_approximation(conts):
+	approx=[]
+	for lista in conts:
+		app=[]
+		carry = 0
+		for inter in lista:
+			i = abs(inter)
+			if i<100 and carry<100:
+				app.append('0')
+				carry += i
+			elif i or carry >=100 and i or carry <200:
+				if inter<0:
+					app.append('-1')
+					carry = 0
+				else:
+					app.append('1')
+					carry = 0
+			elif i or carry >=200 and i or carry <300:
+				if inter<0:
+					app.append('-2')
+					carry = 0
+				else:
+					app.append('2')
+					carry = 0
+			elif i or carry >=300 and i or carry <400:
+				if inter<0:
+					app.append('-3')
+					carry = 0
+				else:
+					app.append('3')
+					carry = 0
+			elif i or carry >=400 and i or carry <500:
+				if inter<0:
+					app.append('-4')
+					carry = 0
+				else:
+					app.append('4')
+					carry = 0
+			elif i or carry >=500 and i or carry <600:
+				if inter<0:
+					app.append('-5')
+					carry = 0
+				else:
+					app.append('5')
+					carry =0
+			elif i or carry >=600 and i or carry <700:
+				if inter<0:
+					app.append('-6')
+					carry = 0
+				else:
+					app.append('6')
+					carry =0
+			elif i or carry >=700 and i or carry <800:
+				if inter<0:
+					app.append('-7')
+					carry = 0
+				else:
+					app.append('7')
+					carry =0
+			elif i or carry >=800 and i or carry <900:
+				if inter<0:
+					app.append('-8')
+					carry = 0
+				else:
+					app.append('8')
+					carry =0
+			elif i or carry >900:
+				if inter<0:
+					app.append('-10')
+					carry = 0
+				else:
+					app.append('10')
+					carry =0
+		approx.append(app)
+	return approx
 
 
 def get_contour_scale(fq):
