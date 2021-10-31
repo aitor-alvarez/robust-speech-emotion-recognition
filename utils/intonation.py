@@ -143,7 +143,7 @@ def get_interval_representation(inter):
 		else:
 			return '1'
 	elif i  >= 300 and i < 500:
-		if inter < '0':
+		if inter < 0:
 			return '-2'
 		else:
 			return '2'
