@@ -89,82 +89,104 @@ def get_interval_contour(fqs):
 	return contours, inds
 
 
-#Get contour approximation by intervals in cents
-def create_contour_approximation(conts):
-	approx=[]
-	for lista in conts:
-		app=[]
+#Extract contour approximation by the slope
+def extract_contour_slope(contours):
+	slope_contour = []
+	indices = []
+	for lista in contours:
+		contours_approx = []
 		carry = 0
-		for inter in lista:
-			i = abs(inter)
-			if i<100 and carry<100:
-				app.append('0')
-				carry += i
-			elif i or carry >=100 and i or carry <200:
-				if inter<0:
-					app.append('-1')
-					carry = 0
-				else:
-					app.append('1')
-					carry = 0
-			elif i or carry >=200 and i or carry <300:
-				if inter<0:
-					app.append('-2')
-					carry = 0
-				else:
-					app.append('2')
-					carry = 0
-			elif i or carry >=300 and i or carry <400:
-				if inter<0:
-					app.append('-3')
-					carry = 0
-				else:
-					app.append('3')
-					carry = 0
-			elif i or carry >=400 and i or carry <500:
-				if inter<0:
-					app.append('-4')
-					carry = 0
-				else:
-					app.append('4')
-					carry = 0
-			elif i or carry >=500 and i or carry <600:
-				if inter<0:
-					app.append('-5')
-					carry = 0
-				else:
-					app.append('5')
-					carry =0
-			elif i or carry >=600 and i or carry <700:
-				if inter<0:
-					app.append('-6')
-					carry = 0
-				else:
-					app.append('6')
-					carry =0
-			elif i or carry >=700 and i or carry <800:
-				if inter<0:
-					app.append('-7')
-					carry = 0
-				else:
-					app.append('7')
-					carry =0
-			elif i or carry >=800 and i or carry <900:
-				if inter<0:
-					app.append('-8')
-					carry = 0
-				else:
-					app.append('8')
-					carry =0
-			elif i or carry >900:
-				if inter<0:
-					app.append('-10')
-					carry = 0
-				else:
-					app.append('10')
-					carry =0
-		approx.append(app)
-	return approx
+		inds=[]
+		index=0
+		for index in range (0, len(lista)):
+			if index == 0:
+				carry = lista[index]
+				inds.append(index)
+			else:
+				if lista[index] < 0 and carry <= 0:
+					carry += lista[index]
+					inds[-1] =index
+				elif lista[index] > 0 and carry >= 0:
+					carry += lista[index]
+					inds[-1] = index
+				elif lista[index] < 0 and carry > 0:
+					if index == len(lista) - 1:
+						inds.append(index)
+						contours_approx.append(get_interval_representation(carry))
+						contours_approx.append(get_interval_representation(lista[index]))
+					else:
+						inds.append(index)
+						contours_approx.append(get_interval_representation(carry))
+						carry = lista[index]
+				elif lista[index] > 0 and carry < 0:
+					if index == len(lista) - 1:
+						inds.append(index)
+						contours_approx.append(get_interval_representation(carry))
+						contours_approx.append(get_interval_representation(lista[index]))
+					else:
+						inds.append(index)
+						contours_approx.append(get_interval_representation(carry))
+						carry = lista[index]
+		slope_contour.append(contours_approx)
+		indices.append(inds)
+	return slope_contour, indices
+
+
+#Return interval represented in 0-10 steps
+def get_interval_representation(inter):
+	i = abs(inter)
+	if i < 75:
+		return '0'
+	elif i >= 75 and i < 300:
+		if inter < 0:
+			return '-1'
+		else:
+			return '1'
+	elif i  >= 300 and i < 500:
+		if inter < '0':
+			return '-2'
+		else:
+			return '2'
+	elif i >= 500 and i < 700:
+		if inter < 0:
+			return '-3'
+		else:
+			return '3'
+	elif i >= 700 and i < 900:
+		if inter < 0:
+			return '-4'
+		else:
+			return '4'
+	elif i  >= 900 and i < 1100:
+		if inter < 0:
+			return '-5'
+		else:
+			return '5'
+	elif i >= 1100 and i < 1300:
+		if inter < 0:
+			return '-6'
+		else:
+			return '6'
+	elif i  >= 1300 and i < 1500:
+		if inter < 0:
+			return '-7'
+		else:
+			return '7'
+	elif i >= 1500 and i < 1700:
+		if inter < 0:
+			return '-8'
+		else:
+			return '8'
+	elif i >= 1700 and i < 1900:
+		if inter < 0:
+			return '-9'
+		else:
+			return '9'
+	elif i > 1900:
+		if inter < 0:
+			return '-10'
+		else:
+			return '10'
 
 
 def get_contour_scale(fq):
