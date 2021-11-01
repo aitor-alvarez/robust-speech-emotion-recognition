@@ -1,13 +1,14 @@
 '''
-From the set of closed frequent patterns this class filters out patterns by their type: maximal, minimal.
+From the set of closed frequent patterns, this class filters out patterns by their type: maximal, minimal.
 It takes as input a text file with the list of patterns as strings and with their frequency.
 Only the maximal subset is returned, but it can be easily adjusted.
 '''
 
 class ClosedPatterns:
 
-    def __init__(self, patterns_file):
+    def __init__(self, patterns_file, output_file):
         self.patterns = patterns_file
+        self.output_file = output_file
 
 
     def execute(self):
@@ -43,7 +44,8 @@ class ClosedPatterns:
                     elif not self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]==1 and patterns[i][0] not in maximal and patterns[i][0] not in closed and patterns[i][0] not in minimal:
                         minimal.append(patterns[i][0])
                         minimal_index.append(i)
-        return maximal
+
+        self.write_patterns_to_file(maximal)
 
 
     def read_files(self):
@@ -69,3 +71,9 @@ class ClosedPatterns:
             out = out.split()
             patterns.append((out, int(el[el.find(']') + 1:].replace('\n',''))))
         return patterns
+
+    def write_patterns_to_file(self, patterns):
+        file_ = open(self.output_file, 'a')
+        for p in patterns:
+            file_.write(str(p) + "\n")
+        file_.close()
