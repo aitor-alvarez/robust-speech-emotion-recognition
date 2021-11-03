@@ -1,5 +1,5 @@
-# robust-speech-emotion-recognition
-## Speech emotion recognition models and feature extractors
+# Robust Speech EMotion Recognition
+### Speech emotion recognition models and feature extractors
 
 For extracting tonal rhythm from utterances execute the following command:
 
