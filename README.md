@@ -9,10 +9,10 @@ arguments:
 
   -h, --help            show this help message and exit
   
-  -a AUDIO_DIR, --audio_dir AUDIO_DIR
+  -a AUDIO_DIR, --audio_dir
                         The audio directory where the files are located
                         
-  -e EMOTION, --emotion EMOTION
+  -e EMOTION, --emotion
                         Emotion tag
 
 
