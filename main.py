@@ -3,6 +3,7 @@ from utils.gapbide import Gapbide
 from utils.ClosedPatterns import ClosedPatterns
 from statistics import mean, stdev
 import pandas as pd
+import argparse
 
 
 def get_patterns(audio_dir, emotion='neutral'):
@@ -34,5 +35,17 @@ def get_patterns(audio_dir, emotion='neutral'):
 	df.to_excel('results_'+emotion+'.xlsx')
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--audio_dir', type=str, default = None,
+                        help='The audio directory where the files are located')
+
+    parser.add_argument('-e', '--emotion', type=str, default = None,
+                        help='Emotion tag')
+    args = parser.parse_args()
+
+    get_patterns(args.audio_dir, args.emotion)
 
 
+if __name__ == '__main__':
+    main()
