@@ -97,7 +97,6 @@ def extract_contour_slope(contours):
 		contours_approx = []
 		carry = 0
 		inds=[]
-		index=0
 		for index in range (0, len(lista)):
 			if index == 0:
 				carry = lista[index]
@@ -115,21 +114,75 @@ def extract_contour_slope(contours):
 						contours_approx.append(get_interval_representation(carry))
 						contours_approx.append(get_interval_representation(lista[index]))
 					else:
-						inds.append(index)
-						contours_approx.append(get_interval_representation(carry))
-						carry = lista[index]
+						inter = get_interval_representation(carry)
+						if inter == '0':
+							carry+=0
+						else:
+							inds.append(index)
+							contours_approx.append(inter)
+							carry = lista[index]
 				elif lista[index] > 0 and carry < 0:
 					if index == len(lista) - 1:
 						inds.append(index)
 						contours_approx.append(get_interval_representation(carry))
 						contours_approx.append(get_interval_representation(lista[index]))
 					else:
-						inds.append(index)
-						contours_approx.append(get_interval_representation(carry))
-						carry = lista[index]
+						inter = get_interval_representation(carry)
+						if inter == '0':
+							carry += 0
+						else:
+							inds.append(index)
+							contours_approx.append(inter)
+							carry = lista[index]
 		slope_contour.append(contours_approx)
 		indices.append(inds)
 	return slope_contour, indices
+
+
+#Peak-to-peak and valley-t0-valley and slopes
+def peak_to_peak(ints, inds):
+	peak = []
+	peak_slope=[]
+	val =[]
+	val_slope=[]
+	for lista, ind in zip(ints, inds):
+		pk=[]
+		vl=[]
+		pk_slope=[]
+		vl_slope=[]
+		pos_ind=0
+		neg_ind=0
+		for i in range (0, len(lista)):
+			if i == 0:
+				if int(lista[i]) > 0:
+					pos_ind =i
+				elif int(lista[i]) < 0:
+					neg_ind = i
+			else:
+				if int(lista[i]) >0 and pos_ind>0:
+					pk.append(ind[i]-ind[pos_ind])
+					pk_slope.append(abs((int(lista[i])-int(ind[i-1]))/(ind[i]-ind[i-1])))
+					pos_ind = i
+				elif int(lista[i]) >0 and pos_ind==0:
+					pk.append(ind[i])
+					pk_slope.append(abs(int(lista[i])/ind[i]))
+					pos_ind = i
+				elif int(lista[i]) <0 and neg_ind>0:
+					vl.append(abs(ind[i]-ind[neg_ind]))
+					vl_slope.append(abs((int(lista[i])-int(ind[i-1]))/(ind[i]-ind[i-1])))
+					neg_ind = i
+				elif int(lista[i]) <0 and neg_ind==0:
+					vl.append(ind[i])
+					vl_slope.append(abs(int(lista[i])/ind[i]))
+					neg_ind = i
+		peak.append(pk)
+		val.append(vl)
+		peak_slope.append(pk_slope)
+		val_slope.append(vl_slope)
+	return peak, val, peak_slope, val_slope
+
+
+
 
 
 #Return interval represented in 0-10 steps
