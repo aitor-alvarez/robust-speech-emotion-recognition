@@ -14,4 +14,4 @@ arguments:
 
 
 
-This command will return the results in a spreadsheet and all closed and maximal patterns in 2 different files. Pattern files will be located in the directory "patterns".
+This command will return the results in a spreadsheet. All closed and maximal patterns will be outputed in 2 different files. Pattern files will be located in the directory "patterns".
