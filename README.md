@@ -1,6 +1,8 @@
 # Robust Speech Emotion Recognition
 ### Speech emotion recognition models and feature extractors
 
+### Extracting Tonal Rhythm from a directory
+
 For extracting tonal rhythm from utterances execute the following command:
 
 python main.py -a "/the_directory/where_files/are_located/" -e "emotion_tag"
