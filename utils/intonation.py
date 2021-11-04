@@ -182,9 +182,6 @@ def peak_to_peak(ints, inds):
 	return peak, val, peak_slope, val_slope
 
 
-
-
-
 #Return interval represented in 0-10 steps
 def get_interval_representation(inter):
 	i = abs(inter)

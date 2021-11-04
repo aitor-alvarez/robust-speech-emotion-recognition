@@ -4,11 +4,14 @@ from utils.ClosedPatterns import ClosedPatterns
 from statistics import mean, stdev
 import pandas as pd
 import argparse
+from utils.tools import get_activation_values
 
 
-def get_patterns(audio_dir, emotion='neutral'):
+def get_patterns(audio_dir, emotion='neutral', data_file =None):
 	#extract f0 and get the contours for each audio file
 	fqs, files = get_f0_praat(audio_dir)
+	if data_file:
+		activations = get_activation_values(files, data_file, 'wav_file', 'activation')
 	fq_list = [[f for f in fq if f>0] for fq in fqs]
 	F0_mean =[mean(fqs) for fqs in fq_list]
 	F0_range = [max(fqs) - min(fqs) for fqs in fq_list]
@@ -25,14 +28,20 @@ def get_patterns(audio_dir, emotion='neutral'):
 	g1.run()
 	pats = ClosedPatterns(intervals_file+'_intervals.txt', intervals_file+'_maximal.txt')
 	pats.execute()
+	data0 = pd.DataFrame({'Filename': files})
 	data1 = pd.DataFrame({'F0_mean': F0_mean})
 	data2 = pd.DataFrame({'F0_range': F0_range})
 	data3 = pd.DataFrame({'stdv_pk ': stdv_pk})
 	data4 = pd.DataFrame({'stdv_val':stdv_val})
 	data5 = pd.DataFrame({'stdv_pos_slope': stdv_pos_slope})
 	data6 = pd.DataFrame({'stdv_neg_slope': stdv_neg_slope })
-	df = pd.concat([data1, data2, data3, data4, data5, data6], axis=1)
-	df.to_excel('results_'+emotion+'.xlsx')
+	if data_file:
+		data00= pd.DataFrame({'Arousal': activations})
+		df = pd.concat([data0, data00, data1, data2, data3, data4, data5, data6], axis=1)
+		df.to_excel('results_' + emotion + '.xlsx')
+	else:
+		df = pd.concat([data0, data1, data2, data3, data4, data5, data6], axis=1)
+		df.to_excel('results_'+emotion+'.xlsx')
 
 
 def main():
@@ -42,6 +51,10 @@ def main():
 
     parser.add_argument('-e', '--emotion', type=str, default = None,
                         help='Emotion tag')
+
+    parser.add_argument('-d', '--data_file', type=str, default=None,
+                        help='Excel spreadsheet with arousal levels per audio file')
+
     args = parser.parse_args()
 
     get_patterns(args.audio_dir, args.emotion)
