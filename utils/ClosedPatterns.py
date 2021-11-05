@@ -12,7 +12,7 @@ class ClosedPatterns:
 
 
     def execute(self):
-        patterns = self.read_files(self.patterns)
+        patterns = self.read_files()
         closed=[]
         maximal=[]
         max_freq=[]
@@ -50,7 +50,7 @@ class ClosedPatterns:
         self.write_patterns_to_file(maximal, max_freq)
 
 
-    def read_files(self, patterns):
+    def read_files(self):
         p = open(self.patterns, "r")
         p = p.readlines()
         pat = self.parse_patterns(p)
@@ -65,7 +65,7 @@ class ClosedPatterns:
             return result
 
 
-    def parse_patterns(p):
+    def parse_patterns(self, p):
         patterns = []
         for el in p:
             out = el[:el.find (']') + 1]
@@ -117,7 +117,7 @@ class UniquePatterns:
     def read_files(self, patterns):
         p = open(patterns, "r")
         p = p.readlines()
-        pat = ClosedPatterns.parse_patterns(p)
+        pat = ClosedPatterns.parse_patterns('', p)
         return pat
 
     def write_patterns_to_file(self, patterns, freq):
