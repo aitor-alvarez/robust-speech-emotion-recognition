@@ -12,9 +12,10 @@ class ClosedPatterns:
 
 
     def execute(self):
-        patterns = self.read_files()
+        patterns = self.read_files(self.patterns)
         closed=[]
         maximal=[]
+        max_freq=[]
         index=[]
         max_index=[]
         minimal=[]
@@ -36,6 +37,7 @@ class ClosedPatterns:
                         blocked.append(patterns[i][0])
                     elif (not self.isSubpattern(patterns[k][0], patterns[i][0]) and not self.isSubpattern(patterns[i][0], patterns[k][0])) and patterns[i][1]>1 and patterns[i][0] not in maximal and patterns[i][0] not in closed:
                         maximal.append(patterns[i][0])
+                        max_freq.append(patterns[i][1])
                         max_index.append(i)
                     elif patterns[i][0] in maximal and self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]>1:
                         indx =maximal.index(patterns[i][0])
@@ -45,10 +47,10 @@ class ClosedPatterns:
                         minimal.append(patterns[i][0])
                         minimal_index.append(i)
 
-        self.write_patterns_to_file(maximal)
+        self.write_patterns_to_file(maximal, max_freq)
 
 
-    def read_files(self):
+    def read_files(self, patterns):
         p = open(self.patterns, "r")
         p = p.readlines()
         pat = self.parse_patterns(p)
@@ -56,14 +58,14 @@ class ClosedPatterns:
 
 
     def isSubpattern(self, pattern, sub):
-        if len(sub) >= len(pattern):
-            return False
+        if sub == pattern:
+            return True
         else:
             result = all(elem in pattern for elem in sub)
             return result
 
 
-    def parse_patterns(self, p):
+    def parse_patterns(p):
         patterns = []
         for el in p:
             out = el[:el.find (']') + 1]
@@ -72,8 +74,56 @@ class ClosedPatterns:
             patterns.append((out, int(el[el.find(']') + 1:].replace('\n',''))))
         return patterns
 
-    def write_patterns_to_file(self, patterns):
+
+    def write_patterns_to_file(self, patterns, freq):
         file_ = open(self.output_file, 'a')
-        for p in patterns:
-            file_.write(str(p) + "\n")
+        for p in range(0, len(patterns)):
+            file_.write(str(patterns[p])+str(freq[p]) + "\n")
+        file_.close()
+
+
+class UniquePatterns:
+    # Find unique patterns in a class when comparing to a reference (reference_class_file)
+    # pass 2 pattern files and get the list of unique patterns written to a new text file.
+    def __init__(self, reference_class_file, class_file):
+        self.ref = reference_class_file
+        self.compare = class_file
+
+    def get_unique_patterns(self):
+        ref_pat = self.read_files(self.ref)
+        refp = [r[0] for r in ref_pat ]
+        compare_pat = self.read_files(self.compare)
+        comp = [c[0] for c in compare_pat]
+        unique = []
+        freq=[]
+        sub=[]
+        for c in range(0, len(comp)):
+            for r in refp:
+                if comp[c] == r:
+                    pass
+                elif ClosedPatterns.isSubpattern('', comp[c], r):
+                    if compare_pat[c][0] not in sub:
+                        sub.append(compare_pat[c][0])
+                    if compare_pat[c][0] in unique:
+                        indx = unique.index(compare_pat[c][0])
+                        unique.pop(indx)
+                        freq.pop(indx)
+                elif comp[c] not in unique and comp[c] not in sub:
+                    unique.append(compare_pat[c][0])
+                    freq.append(compare_pat[c][1])
+        self.write_patterns_to_file(unique, freq)
+        print(str(len(unique))+" unique patterns extracted")
+
+
+    def read_files(self, patterns):
+        p = open(patterns, "r")
+        p = p.readlines()
+        pat = ClosedPatterns.parse_patterns(p)
+        return pat
+
+    def write_patterns_to_file(self, patterns, freq):
+        filename = self.compare.replace('.txt', '')+'_unique.txt'
+        file_ = open(filename, 'a')
+        for p in range(0, len(patterns)):
+            file_.write(str(patterns[p])+str(freq[p]) + "\n")
         file_.close()
