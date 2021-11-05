@@ -98,19 +98,18 @@ class UniquePatterns:
         freq=[]
         sub=[]
         for c in range(0, len(comp)):
-            for r in refp:
-                if comp[c] == r:
-                    pass
-                elif ClosedPatterns.isSubpattern('', comp[c], r):
-                    if compare_pat[c][0] not in sub:
-                        sub.append(compare_pat[c][0])
-                    if compare_pat[c][0] in unique:
-                        indx = unique.index(compare_pat[c][0])
+            if comp[c] in refp:
+                pass
+            elif comp[c] not in unique and comp[c] not in sub:
+                unique.append(compare_pat[c][0])
+                freq.append(compare_pat[c][1])
+        for u in unique:
+            for k in refp:
+                if ClosedPatterns.isSubpattern('', u, k) or ClosedPatterns.isSubpattern('', k, u):
+                    if u in unique:
+                        indx = unique.index(u)
                         unique.pop(indx)
                         freq.pop(indx)
-                elif comp[c] not in unique and comp[c] not in sub:
-                    unique.append(compare_pat[c][0])
-                    freq.append(compare_pat[c][1])
         self.write_patterns_to_file(unique, freq)
         print(str(len(unique))+" unique patterns extracted")
 
