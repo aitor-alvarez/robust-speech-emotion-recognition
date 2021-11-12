@@ -1,7 +1,7 @@
 '''
 From the set of closed frequent patterns, this class filters out patterns by their type: maximal, minimal.
 It takes as input a text file with the list of patterns as strings and with their frequency.
-Only the maximal subset is returned, but it can be easily adjusted.
+Only the maximal subset is returned.
 '''
 
 class ClosedPatterns:
@@ -13,41 +13,41 @@ class ClosedPatterns:
 
     def execute(self):
         patterns = self.read_files()
-        closed=[]
-        maximal=[]
+        closed = []
+        maximal = []
+        index = []
+        max_index = []
+        minimal = []
+        minimal_index = []
+        blocked = []
         max_freq=[]
-        index=[]
-        max_index=[]
-        minimal=[]
-        minimal_index=[]
-        blocked=[]
-        for i in range (0, len(patterns)):
-            for k in range (0, len(patterns)):
+        for i in range(0, len(patterns)):
+            for k in range(0, len(patterns)):
                 if k == i:
                     continue
                 else:
-                    if self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]>1 and patterns[k][1]>1 and patterns[i][1]>patterns[k][1]:
+                    if self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1] > 1 and patterns[k][1] > 1 and patterns[i][1] > patterns[k][1]:
                         if patterns[i][0] not in closed and patterns[i][0] not in maximal:
                             closed.append(patterns[i][0])
                             index.append(i)
-                    elif self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]>1 and patterns[i][1]<=patterns[k][1] and patterns[i][0] in closed:
+                    elif self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1] > 1 and patterns[i][1] <=  patterns[k][1] and patterns[i][0] in closed:
                         ind = closed.index(patterns[i][0])
                         closed.remove(patterns[i][0])
                         index.pop(ind)
                         blocked.append(patterns[i][0])
-                    elif (not self.isSubpattern(patterns[k][0], patterns[i][0]) and not self.isSubpattern(patterns[i][0], patterns[k][0])) and patterns[i][1]>1 and patterns[i][0] not in maximal and patterns[i][0] not in closed:
+                    elif (not self.isSubpattern(patterns[k][0], patterns[i][0]) and not self.isSubpattern(patterns[i][0],patterns[k][ 0])) and patterns[i][0] not in maximal and patterns[i][0] not in closed:
                         maximal.append(patterns[i][0])
                         max_freq.append(patterns[i][1])
                         max_index.append(i)
-                    elif patterns[i][0] in maximal and self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]>1:
-                        indx =maximal.index(patterns[i][0])
+                    elif patterns[i][0] in maximal and self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1] > 1:
+                        indx = maximal.index(patterns[i][0])
                         max_index.pop(indx)
                         maximal.remove(patterns[i][0])
-                    elif not self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1]==1 and patterns[i][0] not in maximal and patterns[i][0] not in closed and patterns[i][0] not in minimal:
+                    elif not self.isSubpattern(patterns[k][0], patterns[i][0]) and patterns[i][1] == 1 and patterns[i][
+                        0] not in maximal and patterns[i][0] not in closed and patterns[i][0] not in minimal:
                         minimal.append(patterns[i][0])
                         minimal_index.append(i)
-
-        self.write_patterns_to_file(maximal, max_freq)
+        self.write_patterns_to_file(maximal)
 
 
     def read_files(self):
@@ -61,8 +61,12 @@ class ClosedPatterns:
         if sub == pattern:
             return True
         else:
-            result = all(elem in pattern for elem in sub)
-            return result
+            p = ''.join(pattern)
+            s = ''.join(sub)
+            if p.find(s) !=-1:
+                return True
+            else:
+                return False
 
 
     def parse_patterns(self, p):

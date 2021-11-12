@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 #Segment speech utterances based on
 def extract_speech_utterances(dir_path, slice_path):
-	files = [f for f in os.listdir(dir_path) if f.endswith('.wav')]
+	files = [f for f in os.listdir(dir_path) if f.endswith('.flac')]
 	pitches = [parselmouth.Sound(dir_path+f).to_pitch() for f in files ]
 	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
 	k = 0
@@ -22,18 +22,18 @@ def extract_speech_utterances(dir_path, slice_path):
 		diff = np.diff(nonzero)
 		skip_inds = np.where(diff>1)[0]
 		newInd = nonzero[0]
-		filename = files[k].replace('.wav', '')
+		filename = files[k].replace('.flac', '')
 		for s in skip_inds:
 			try:
 				dist  = pitches[k].get_time_from_frame_number(nonzero[s+1])- pitches[k].get_time_from_frame_number(nonzero[s])
 				if dist >= 0.25:
-					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(s)+'.wav', dir_path+filename+'.wav')
+					slice_audio(pitches[k].get_time_from_frame_number(newInd), pitches[k].get_time_from_frame_number(nonzero[s]), slice_path, filename+'_'+str(s)+'.flac', dir_path+filename+'.flac')
 					newInd = nonzero[s+1]
 			except:
 				print("error")
 		dist = pitches[k].get_time_from_frame_number(len(pitches[k])) - pitches[k].get_time_from_frame_number(nonzero[-1])
 		if dist >= 0.25 and dist<0.5:
-			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(s+1)+'.wav', dir_path+filename+'.wav')
+			slice_audio(pitches[k].get_time_from_frame_number(nonzero[-1]), pitches[k].get_time_from_frame_number(len(pitches[k])), slice_path, filename+'_'+str(s+1)+'.flac', dir_path+filename+'.flac')
 		k +=1
 	print("segmentation completed")
 
@@ -50,7 +50,7 @@ def slice_audio(slice_from, slice_to, path, name, audio_file):
 
 #extract f0 from Kaldi pitch function
 def get_f0_kaldi(audio_dir):
-	files = [torchaudio.load(audio_dir+f) for f in os.listdir(audio_dir) if f.endswith('.wav')]
+	files = [torchaudio.load(audio_dir+f) for f in os.listdir(audio_dir) if f.endswith('.flac')]
 	pitch_feat = [ F.compute_kaldi_pitch(t[0], t[1], min_f0=50, max_f0=500)[0].tolist() for t in files]
 	fqs = []
 	for p in pitch_feat:
@@ -63,7 +63,7 @@ def get_f0_kaldi(audio_dir):
 
 #extract f0 from Parselmouth Praat function
 def get_f0_praat(audio_dir):
-	files = [f for f in os.listdir(audio_dir) if f.endswith('.wav')]
+	files = [f for f in os.listdir(audio_dir) if f.endswith('.flac')]
 	pitches = [parselmouth.Sound(audio_dir + f).to_pitch() for f in files]
 	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
 	return fqs, files

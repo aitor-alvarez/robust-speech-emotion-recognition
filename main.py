@@ -1,12 +1,12 @@
 from utils.intonation import *
 from utils.gapbide import Gapbide
-from utils.ClosedPatterns import ClosedPatterns, UniquePatterns
+from utils.MaximalPatterns import MaximalPatterns, UniquePatterns
 from statistics import mean, stdev
 import pandas as pd
 import argparse
 from utils.tools import get_activation_values
 from scipy import stats
-
+import os
 
 def get_patterns(audio_dir, emotion='neutral', data_file =None):
   #extract f0 and get the contours for each audio file
@@ -23,12 +23,13 @@ def get_patterns(audio_dir, emotion='neutral', data_file =None):
   stdv_val = [stdev(v) for v in val_to_val if len(v)>1]
   stdv_pos_slope = [stdev(p) for p in pos_slope if len(p)>1]
   stdv_neg_slope = [stdev(n) for n in neg_slope if len(n)>1]
-  pattern_length = 4
+  pattern_length = 5
   intervals_file = 'patterns/'+emotion
-  g1 = Gapbide(intervals, 4, 0, 0, pattern_length, intervals_file)
+  g1 = Gapbide(intervals, 6, 0, 0, pattern_length, intervals_file)
   g1.run()
-  pats = ClosedPatterns(intervals_file+'_intervals.txt', intervals_file+'_maximal.txt')
-  pats.execute()
+  MaximalPatterns(intervals_file+'_intervals.txt', intervals_file+'_maximal.txt').execute()
+  os.remove(intervals_file+'.txt')
+  os.remove(intervals_file+'_intervals.txt')
   data0 = pd.DataFrame({'Filename': files})
   data1 = pd.DataFrame({'F0_mean': stats.zscore(F0_mean, nan_policy='omit')})
   data2 = pd.DataFrame({'F0_range': stats.zscore(F0_range, nan_policy='omit')})
@@ -52,6 +53,7 @@ def get_patterns(audio_dir, emotion='neutral', data_file =None):
 def get_unique_patterns(file1, file2):
 	uni = UniquePatterns(file1, file2)
 	uni.get_unique_patterns()
+
 
 
 def main():
