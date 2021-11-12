@@ -32,11 +32,15 @@ class MaximalPatterns:
         return pat
 
 
-    def isSubpattern(pattern, sub):
-        if pattern.find(sub) != -1:
-            return True
-        else:
-            return False
+    def parse_patterns(self, p):
+        patterns = []
+        for el in p:
+            out = el[:el.find (']') + 1]
+            out = out.replace ('[', '').replace(']', '').replace("'", '').replace(',', ' ')
+            out = out.split()
+            patterns.append((out, int(el[el.find(']') + 1:].replace('\n',''))))
+        return patterns
+
 
 
     def write_patterns_to_file(self, patterns):
@@ -59,9 +63,11 @@ class UniquePatterns:
         unique = [c for c in comp if c not in ref]
         output = []
         for u in unique:
-            for c in comp:
-                if u.find(c) != -1 and c.find(u) != -1 and c not in output:
-                    output.append(c)
+            for r in ref:
+                if u.find(r) == -1 and r.find(u) == -1 and u not in output:
+                    output.append(u)
+                elif (u.find(r) != -1 or r.find(u) != -1) and u in output:
+                    output.remove(u)
 
         self.write_patterns_to_file(output)
         print(str(len(output))+" unique patterns extracted")
