@@ -5,7 +5,6 @@ from statistics import mean, stdev
 import pandas as pd
 import argparse
 from utils.tools import get_activation_values
-from scipy import stats
 import os
 
 def get_patterns(audio_dir, emotion='neutral', data_file =None):
@@ -25,11 +24,10 @@ def get_patterns(audio_dir, emotion='neutral', data_file =None):
   stdv_neg_slope = [stdev(n) for n in neg_slope if len(n)>1]
   pattern_length = 5
   intervals_file = 'patterns/'+emotion
-  g1 = Gapbide(intervals, 6, 0, 0, pattern_length, intervals_file)
-  g1.run()
+  Gapbide(intervals, 6, 0, 0, pattern_length, intervals_file).run()
   MaximalPatterns(intervals_file+'_intervals.txt', intervals_file+'_maximal.txt').execute()
   os.remove(intervals_file+'.txt')
-  os.remove(intervals_file+'_intervals.txt')
+  #os.remove(intervals_file+'_intervals.txt')
   data0 = pd.DataFrame({'Filename': files})
   data1 = pd.DataFrame({'F0_mean': F0_mean})
   data2 = pd.DataFrame({'F0_range': F0_range})
@@ -41,12 +39,10 @@ def get_patterns(audio_dir, emotion='neutral', data_file =None):
     data00= pd.DataFrame({'Arousal': activations})
     df = pd.concat([data0, data00, data1, data2, data3, data4, data5, data6], axis=1)
     df['Macro_Rhythm_Ind'] = df['stdv_pk'] + df['stdv_val'] + df['stdv_pos_slope'] + df['stdv_neg_slope']
-    #df['Macro_Rhythm_Ind'] = stats.zscore(df['Macro_Rhythm_Ind'], nan_policy='omit')
     df.to_excel('results_' + emotion + '.xlsx')
   else:
     df = pd.concat([data0, data1, data2, data3, data4, data5, data6], axis=1)
     df['Macro_Rhythm_Ind'] = df['stdv_pk'] + df['stdv_val'] + df['stdv_pos_slope'] + df['stdv_neg_slope']
-    #df['Macro_Rhythm_Ind'] = stats.zscore(df['Macro_Rhythm_Ind'], nan_policy='omit')
     df.to_excel('results_'+emotion+'.xlsx')
 
 

@@ -4,7 +4,8 @@ It takes as input a text file with the list of patterns as strings.
 Only the maximal subset is returned.
 '''
 
-from itertools import combinations
+from itertools import combinations, product, permutations
+import re
 
 class MaximalPatterns:
 
@@ -21,7 +22,7 @@ class MaximalPatterns:
         for p, k in combinations(pstr, 2):
             if p.find(k) != -1:
                 not_max.append(k)
-        output = [p for p in pstr if p not in not_max]
+        output = [re.findall('[-+]?\d', p) for p in pstr if p not in not_max]
         self.write_patterns_to_file(output)
 
 
@@ -59,16 +60,16 @@ class UniquePatterns:
 
     def get_unique_patterns(self):
         ref = self.read_files(self.ref)
+        ref = [''.join(p) for p in ref]
         comp = self.read_files(self.compare)
+        comp = [''.join(p) for p in comp]
         unique = [c for c in comp if c not in ref]
-        output = []
-        for u in unique:
-            for r in ref:
-                if u.find(r) == -1 and r.find(u) == -1 and u not in output:
-                    output.append(u)
-                elif (u.find(r) != -1 or r.find(u) != -1) and u in output:
-                    output.remove(u)
-
+        compare = list(product(ref, unique))
+        not_unique = []
+        for r, u in compare:
+            if (r.find(u) != -1 or u.find(r) != -1) and u not in not_unique:
+                not_unique.append(u)
+        output = [re.findall('[-+]?\d', c) for c in unique if c not in not_unique]
         self.write_patterns_to_file(output)
         print(str(len(output))+" unique patterns extracted")
 
@@ -76,11 +77,22 @@ class UniquePatterns:
     def read_files(self, patterns):
         p = open(patterns, 'r')
         p = p.readlines()
-        return p
+        pat = self.parse_patterns(p)
+        return pat
+
+
+    def parse_patterns(self, p):
+        patterns = []
+        for el in p:
+            out = el[:el.find (']') + 1]
+            out = out.replace ('[', '').replace(']', '').replace("'", '').replace(',', ' ')
+            out = out.split()
+            patterns.append(out)
+        return patterns
 
     def write_patterns_to_file(self, patterns):
         filename = self.compare.replace('.txt', '')+'_unique.txt'
         file_ = open(filename, 'a')
         for p in range(0, len(patterns)):
-            file_.write(str(patterns[p]))
+            file_.write(str(patterns[p])+ "\n")
         file_.close()

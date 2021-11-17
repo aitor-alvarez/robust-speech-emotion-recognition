@@ -64,8 +64,8 @@ def get_f0_kaldi(audio_dir):
 #extract f0 from Parselmouth Praat function
 def get_f0_praat(audio_dir):
 	files = [f for f in os.listdir(audio_dir) if f.endswith('.flac')]
-	pitches = [parselmouth.Sound(audio_dir + f).to_pitch() for f in files]
-	fqs = [pitch.selected_array['frequency'] for pitch in pitches]
+	pitches = [parselmouth.Sound(audio_dir + f).to_pitch(pitch_floor=75.0, pitch_ceiling=650.0) for f in files]
+	fqs = [pitch.kill_octave_jumps().selected_array['frequency'] for pitch in pitches]
 	return fqs, files
 
 
