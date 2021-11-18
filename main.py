@@ -15,7 +15,7 @@ def get_patterns(audio_dir, emotion='neutral', data_file =None):
   fq_list = [[f for f in fq if f>0] for fq in fqs]
   F0_mean =[mean(fqs) for fqs in fq_list]
   F0_range = [max(fqs) - min(fqs) for fqs in fq_list]
-  contours, inds = get_interval_contour(fqs)
+  contours, inds = get_interval_contour(fq_list)
   intervals, inds = extract_contour_slope(contours)
   pk_to_pk, val_to_val, pos_slope, neg_slope = peak_to_peak(intervals, inds)
   stdv_pk = [stdev(p) for p in pk_to_pk if len(p)>1]
