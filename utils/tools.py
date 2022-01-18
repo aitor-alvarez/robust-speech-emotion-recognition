@@ -2,6 +2,9 @@ from tinytag import TinyTag
 import pandas as pd
 import os
 from pydub import AudioSegment
+import matplotlib.pyplot as plt
+
+
 
 def write_metadata_to_excel(audio_dir):
 	file_name =[]
@@ -46,4 +49,14 @@ def cleanup_directory(excel_file, dir):
 					pass
 				else:
 					os.remove(dir+path[-1]+'/'+file)
+
+
+def plot_serie(serie, index, emotion=None):
+	plt.style.use('seaborn')
+	plt.plot(index, serie, marker='o', color='dimgrey', linestyle='solid')
+	plt.tight_layout()
+	plt.title(emotion)
+	plt.xlabel('Time steps (50 ms)')
+	plt.ylabel('Interval')
+	plt.show()
 
