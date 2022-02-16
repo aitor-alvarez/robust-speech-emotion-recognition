@@ -1,8 +1,6 @@
 # Robust Speech Emotion Recognition
 ### Speech emotion recognition models and feature extractors
 
-#### Graph Neural Network model
-
 #### Extracting Tonal Rhythm from a directory
 
 For extracting tonal rhythm from utterances execute the following command:
