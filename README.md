@@ -21,3 +21,7 @@ where -r is the reference file and -c the file with patterns to compare against 
 An extra parameter -d can be added to add activation values from an external spreadsheet.
 
 To see all the parameters use the help function -h.
+
+### Graph Neural Network Models for SER
+
+https://github.com/aitor-arronte/gnn-speech-emotion
