@@ -25,3 +25,17 @@ To see all the parameters use the help function -h.
 ### Graph Neural Network Models for SER
 
 https://github.com/aitor-arronte/gnn-speech-emotion
+
+#### Reference
+
+If you use this software for research please cite the following publication:
+```
+@inproceedings{alvarez22_speechprosody,
+  author={Aitor Arronte Alvarez and Elsayed Issa and Mohammed Alshakhori},
+  title={{Computational modeling of intonation patterns in Arabic emotional speech}},
+  year=2022,
+  booktitle={Proc. Speech Prosody 2022},
+  pages={615--619},
+  doi={10.21437/SpeechProsody.2022-125}
+}
+```
