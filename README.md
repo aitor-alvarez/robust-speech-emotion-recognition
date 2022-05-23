@@ -32,7 +32,7 @@ If you use this software for research please cite the following publication:
 ```
 @inproceedings{alvarez22_speechprosody,
   author={Aitor Arronte Alvarez and Elsayed Issa and Mohammed Alshakhori},
-  title={{Computational modeling of intonation patterns in Arabic emotional speech}},
+  title={Computational modeling of intonation patterns in Arabic emotional speech},
   year=2022,
   booktitle={Proc. Speech Prosody 2022},
   pages={615--619},
